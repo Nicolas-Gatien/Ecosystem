@@ -5,8 +5,8 @@ using UnityEngine;
 public class CreatureMovement : MonoBehaviour
 {
     // FIELDS
-    [SerializeField] private float moveSpeed;
-    [SerializeField] private float turnSpeed;
+    [HideInInspector] public float moveSpeed;
+    [HideInInspector] public float turnSpeed;
 
     [SerializeField] private Transform rotationTransform;
 

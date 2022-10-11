@@ -12,42 +12,20 @@ public class Creature : MonoBehaviour
     public float maxHealth;
     public float health;
 
+    public float size;
+    public float moveSpeed;
+    public float turnSpeed;
+
     // COMPONENTS
     private CreatureMovement movement;
-    private Node movementNode;
-    private Node turningNode;
-
-    // BRAIN
-    public Genome genes;
+    private Rigidbody2D rb;
 
     private void Start()
     {
         movement = GetComponent<CreatureMovement>();
+        rb = GetComponent<Rigidbody2D>();
 
-        List<Node> nodes = new List<Node>
-        {
-            new InputEnergyNode(this),
-            new InputHealthNode(this),
-            new OutputMovementNode(),
-            new OutputTurningNode()
-        };
-
-        movementNode = nodes[2];
-        turningNode = nodes[3];
-
-        ConnectionGene[] connections = new ConnectionGene[4]
-        {
-            new ConnectionGene(nodes[0], nodes[2]),
-            new ConnectionGene(nodes[1], nodes[2]),
-            new ConnectionGene(nodes[0], nodes[3]),
-            new ConnectionGene(nodes[1], nodes[3])
-        };
-
-        genes = new Genome(nodes.ToArray(), connections);
-    }
-
-    private void Update()
-    {
-        
+        movement.moveSpeed = moveSpeed;
+        movement.turnSpeed = turnSpeed;
     }
 }
