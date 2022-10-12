@@ -11,6 +11,10 @@ public class Neat
     private int outputSize;
     private int maxClients;
 
+    public double C1;
+    public double C2;
+    public double C3;
+
     public Neat(int inputSize, int outputSize, int clients)
     {
         this.Reset(inputSize, outputSize, clients);
