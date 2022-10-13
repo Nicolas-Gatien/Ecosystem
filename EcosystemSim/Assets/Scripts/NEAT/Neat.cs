@@ -56,6 +56,7 @@ public class Neat
     public static ConnectionGene GetConnection(ConnectionGene con)
     {
         ConnectionGene c = new ConnectionGene(con.From, con.To);
+        c.InnovationNumber = con.InnovationNumber;
         c.Weight = con.Weight;
         c.Enabled = con.Enabled;
         return c;

@@ -11,13 +11,13 @@ public class Genome
     private List<NodeGene> nodes = new List<NodeGene>();
 
     private Neat neat;
+    private Calculator calculator;
 
     // PROPERTIES
     public List<ConnectionGene> getConnections{
         get{
             List<ConnectionGene> sortedConnections = new List<ConnectionGene>();
             sortedConnections = connections.OrderBy(gene => gene.InnovationNumber).ToList();
-            sortedConnections.Reverse();
 
             return sortedConnections;
         }
@@ -42,8 +42,16 @@ public class Genome
     public double Distance(Genome g2) {
         Genome g1 = this;
 
-        int highestInnovationGene1 = g1.getConnections[g1.getConnections.Count - 1].InnovationNumber;
-        int highestInnovationGene2 = g2.getConnections[g2.getConnections.Count - 1].InnovationNumber;
+        int highestInnovationGene1 = 0;
+        if (g1.getConnections.Count != 0)
+        {
+            highestInnovationGene1 = g1.getConnections[g1.getConnections.Count - 1].InnovationNumber;
+        }
+        int highestInnovationGene2 = 0;
+        if (g2.getConnections.Count != 0)
+        {
+            highestInnovationGene2 = g2.getConnections[g2.getConnections.Count - 1].InnovationNumber;
+        }
 
         if (highestInnovationGene1 < highestInnovationGene2)
         {
@@ -172,6 +180,19 @@ public class Genome
         return child;
     }
 
+    public void GenerateCalculator()
+    {
+        calculator = new Calculator(this);
+    }
+    public double[] Calculate(params double[] ar)
+    {
+        if (calculator == null)
+        {
+            GenerateCalculator();
+        }
+        return calculator.Calculate(ar);
+    }
+
     // %%% CLEAN THIS UP
     public void Mutate() {
         if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
@@ -229,7 +250,6 @@ public class Genome
             return;
         }
     }
-
     public void MutateNode()
     {
         ConnectionGene con = GetRandomConnect(connections);
@@ -258,8 +278,6 @@ public class Genome
 
         nodes.Add(middle);
     }
-
-
     public void MutateWeightShift()
     {
         ConnectionGene con = GetRandomConnect(connections);
@@ -268,7 +286,6 @@ public class Genome
             con.Weight += UnityEngine.Random.Range(-0.3f, 0.3f);
         }
     }
-
     public void MutateWeightRandom()
     {
         ConnectionGene con = GetRandomConnect(connections);
@@ -277,7 +294,6 @@ public class Genome
             con.Weight = UnityEngine.Random.Range(-2f, 2f);
         }
     }
-
     public void MutateLinkToggle()
     {
         ConnectionGene con = GetRandomConnect(connections);
