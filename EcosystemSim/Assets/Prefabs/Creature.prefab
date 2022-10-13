@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6265060582893419510}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Direction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 6265060583414483218}
   - component: {fileID: 6265060583414483219}
   - component: {fileID: 7952064846198185542}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Creature
   m_TagString: Untagged
   m_Icon: {fileID: 0}

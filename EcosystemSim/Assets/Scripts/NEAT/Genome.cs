@@ -11,7 +11,6 @@ public class Genome
     private List<NodeGene> nodes = new List<NodeGene>();
 
     private Neat neat;
-    private Calculator calculator;
 
     // PROPERTIES
     public List<ConnectionGene> getConnections{
@@ -115,7 +114,7 @@ public class Genome
             N = 1;
         }
 
-        // MAKE SURE TO ADD TRAIT DIFF
+        // %%% MAKE SURE TO ADD TRAIT DIFF
         return (
             neat.C1 * (disjoint / N)) 
             + (neat.C2 * (excess / N)) 
@@ -123,6 +122,7 @@ public class Genome
             );
     }
     public static Genome CrossOver(Genome g1, Genome g2) {
+        // %%% ADD TRAITS TO CROSS OVER
         Neat neat = g1.getNeat;
 
         Genome child = neat.EmptyGenome();
@@ -178,19 +178,6 @@ public class Genome
         }
 
         return child;
-    }
-
-    public void GenerateCalculator()
-    {
-        calculator = new Calculator(this);
-    }
-    public double[] Calculate(params double[] ar)
-    {
-        if (calculator == null)
-        {
-            GenerateCalculator();
-        }
-        return calculator.Calculate(ar);
     }
 
     // %%% CLEAN THIS UP
