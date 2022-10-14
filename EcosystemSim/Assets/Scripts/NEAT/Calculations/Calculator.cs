@@ -63,6 +63,7 @@ public class Calculator
         for (int i = 0; i < inputNodes.Count; i++)
         {
             inputNodes[i].Output = input[i];
+
         }
 
         foreach (Node n in hiddenNodes)

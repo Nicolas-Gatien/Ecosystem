@@ -156,17 +156,17 @@ MonoBehaviour:
   - prefab: {fileID: 6265060583414483216, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
     initialSpawnAmount: 50
     recureSpawn: 0
-    timeBtwRecurringSpawn: 0
+    timeBtwRecurringSpawn: 1000
     timeBeforeNextSpawn: 0
-    minPos: {x: -25, y: -25}
-    maxPos: {x: 25, y: 25}
+    minPos: {x: -10, y: -10}
+    maxPos: {x: 10, y: 10}
   - prefab: {fileID: 5810211368083275300, guid: 551a95213fff6d74aa660216a7f504c2, type: 3}
     initialSpawnAmount: 200
     recureSpawn: 1
-    timeBtwRecurringSpawn: 2
+    timeBtwRecurringSpawn: 0.2
     timeBeforeNextSpawn: 0
-    minPos: {x: -25, y: -25}
-    maxPos: {x: 25, y: 25}
+    minPos: {x: -10, y: -10}
+    maxPos: {x: 10, y: 10}
 --- !u!4 &245976123
 Transform:
   m_ObjectHideFlags: 0
@@ -218,7 +218,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.4433962, g: 0.4433962, b: 0.4433962, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -266,81 +266,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1888488420
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 6265060583414483216, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_Name
-      value: Creature
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6265060583414483228, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
---- !u!1 &1888488421 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6265060583414483216, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-  m_PrefabInstance: {fileID: 1888488420}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1888488422
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1888488421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2073771068e9504bb8e6ab9e4092a37, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxEnergy: 0
-  energy: 0
-  maxHealth: 0
-  health: 0

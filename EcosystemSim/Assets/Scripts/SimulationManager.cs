@@ -2,12 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpawnManager : MonoBehaviour
+public class SimulationManager : MonoBehaviour
 {
     // FIELDS
     [SerializeField] private SpawnObject[] spawnObjects;
+    private Neat neat;
 
     // METHODS
+    private void Awake()
+    {
+        neat = new Neat(9, 2, 1);   
+    }
+
     void Start()
     {
         foreach (SpawnObject item in spawnObjects)
@@ -25,7 +31,7 @@ public class SpawnManager : MonoBehaviour
         {
             if (!item.recureSpawn)
             {
-                return;
+                continue;
             }
 
             if (item.timeBeforeNextSpawn < 0)
@@ -41,7 +47,13 @@ public class SpawnManager : MonoBehaviour
 
     void SpawnPrefab(SpawnObject item)
     {
-        Instantiate(item.prefab, GetRandomPosition(item), Quaternion.identity);
+
+        GameObject obj = Instantiate(item.prefab, GetRandomPosition(item), Quaternion.identity);
+
+        if (obj.GetComponent<Creature>() != null)
+        {
+            obj.GetComponent<Creature>().neat = neat;
+        }
     }
 
     Vector2 GetRandomPosition (SpawnObject spawnObject)

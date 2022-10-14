@@ -61,6 +61,7 @@ public class Node
                 sum += con.Weight * con.From.Output;
             }
         }
+
         output = ActivationFunction(sum);
     }
 

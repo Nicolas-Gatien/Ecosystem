@@ -44,9 +44,10 @@ GameObject:
   - component: {fileID: 6265060583414483218}
   - component: {fileID: 6265060583414483219}
   - component: {fileID: 7952064846198185542}
+  - component: {fileID: -2679977639346135762}
   m_Layer: 7
   m_Name: Creature
-  m_TagString: Untagged
+  m_TagString: Creature
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -154,7 +155,7 @@ Rigidbody2D:
   m_Interpolate: 1
   m_SleepingMode: 0
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!70 &7952064846198185542
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -171,3 +172,30 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.5, y: 1}
   m_Direction: 0
+--- !u!114 &-2679977639346135762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6265060583414483216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2073771068e9504bb8e6ab9e4092a37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxEnergy: 100
+  maxHealth: 50
+  health: 5
+  size: 1
+  moveSpeed: 4
+  turnSpeed: 15
+  regenerationRate: 1
+  viewRadius: 5
+  foodMask:
+    serializedVersion: 2
+    m_Bits: 64
+  creatureMask:
+    serializedVersion: 2
+    m_Bits: 128
+  canBreed: 0

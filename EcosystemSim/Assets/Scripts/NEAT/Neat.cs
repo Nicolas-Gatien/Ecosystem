@@ -41,14 +41,14 @@ public class Neat
         for (int i = 0; i < inputSize; i++)
         {
             NodeGene n = GetNode();
-            n.X = 0.1f;
+            n.X = 0.1;
             n.Y = (i + 1) / (double)(inputSize + 1);
         }
 
         for (int i = 0; i < outputSize; i++)
         {
             NodeGene n = GetNode();
-            n.X = 0.9f;
+            n.X = 0.9;
             n.Y = (i + 1) / (double)(outputSize + 1);
         }
     }

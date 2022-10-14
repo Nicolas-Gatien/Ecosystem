@@ -7,10 +7,10 @@ public class Creature : MonoBehaviour
     // FIELDS
     // traits
     [Header("Traits")]
-    public float maxEnergy;
-    public float energy;
+    public float maxEnergy = 500;
+    private float _energy;
 
-    public float maxHealth;
+    public float maxHealth = 50;
     public float health;
 
     public float size;
@@ -31,6 +31,10 @@ public class Creature : MonoBehaviour
     private Genome genome;
     private Species species;
     private Calculator calculator;
+
+    public Neat neat;
+
+    public bool canBreed;
 
     // PROPERTIES
     public Genome Genome
@@ -89,7 +93,7 @@ public class Creature : MonoBehaviour
     {
         get
         {
-            return Physics2D.OverlapCircleAll(transform.position, viewRadius, creatureMask).Length;
+            return Physics2D.OverlapCircleAll(transform.position, viewRadius, creatureMask).Length - 1;
         }
     }
 
@@ -118,6 +122,10 @@ public class Creature : MonoBehaviour
             float smallestDistance = 0;
             for (int i = 0; i < creatures.Length; i++)
             {
+                if (creatures[i].transform == transform)
+                {
+                    continue;
+                }
                 if (Vector2.Distance(transform.position, creatures[i].transform.position) < smallestDistance) 
                 {
                     smallestDistance = Vector2.Distance(transform.position, creatures[i].transform.position);
@@ -144,8 +152,13 @@ public class Creature : MonoBehaviour
                 }
             }
 
+            if (foods.Length > 0)
+            {
+                return Vector2.Angle(transform.position, foods[indexOfNearest].transform.position);
+            }
 
-            return Vector2.Angle(transform.position, foods[indexOfNearest].transform.position);
+            return 0;
+
         }
     }
     private float AngleToNearestCreature
@@ -157,6 +170,11 @@ public class Creature : MonoBehaviour
             int indexOfNearest = 0;
             for (int i = 0; i < creatures.Length; i++)
             {
+                if (creatures[i].transform == transform)
+                {
+                    continue;
+                }
+
                 if (Vector2.Distance(transform.position, creatures[i].transform.position) < smallestDistance)
                 {
                     smallestDistance = Vector2.Distance(transform.position, creatures[i].transform.position);
@@ -169,29 +187,96 @@ public class Creature : MonoBehaviour
         }
     }
 
+    public float energy
+    {
+        get
+        {
+            return _energy;
+        }
+        set
+        {
+            if (value < 0)
+            {
+                _energy = 0;
+                return;
+            }
+
+            if (value > maxEnergy)
+            {
+                canBreed = true;
+                _energy = maxEnergy;
+                return;
+            }
+
+            _energy = value;
+        }
+    }
+
     // METHODS
     private void Start()
     {
+        genome = neat.EmptyGenome();
+        genome.MutateLink();
+        genome.MutateLink();
+        genome.Mutate();
+        genome.Mutate();
+        genome.Mutate();
+        genome.Mutate();
+        genome.Mutate();
+        genome.Mutate();
+        genome.Mutate();
+        genome.Mutate();
+        genome.Mutate();
+        genome.Mutate();
+
         movement = GetComponent<CreatureMovement>();
         rb = GetComponent<Rigidbody2D>();
 
+        energy = maxEnergy;
+        health = maxHealth;
+
         movement.moveSpeed = moveSpeed;
         movement.turnSpeed = turnSpeed;
+
+        transform.localScale = new Vector3(size, size, size);
     }
 
     private void Update()
     {
-        double[] outputs = calculator.Calculate(
-            NumOfFoodsInRadius, 
-            NumOfCreaturesInRadius, 
-            DistanceToNearestFood, 
-            DistanceToNearestCreatures, 
-            AngleToNearestFood, 
-            AngleToNearestCreature, 
-            HealthPercentage, 
-            EnergyPercentage, 
+        double[] outputs = Calculate(
+            EnergyPercentage,
+            HealthPercentage,
+            NumOfFoodsInRadius,
+            NumOfCreaturesInRadius,
+            DistanceToNearestFood,
+            DistanceToNearestCreatures,
+            AngleToNearestFood,
+            AngleToNearestCreature,
             1
         );
+
+        movement.Move((float)outputs[0]);
+        movement.Turn((float)outputs[1]);
+
+        energy -= (((size * (rb.velocity.sqrMagnitude * 0.1f)) / HealthPercentage) + 1) * Time.deltaTime;
+
+        if (energy > 0)
+        {
+            health += regenerationRate;
+        }else
+        {
+            health -= 1;
+        }
+
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
+
+        if (health > maxHealth)
+        {
+            health = maxHealth;
+        }
     }
 
     public double Distance(Creature other)
@@ -214,6 +299,27 @@ public class Creature : MonoBehaviour
             GenerateCalculator();
         }
         return calculator.Calculate(ar);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Food"))
+        {
+            energy += 50 / size;
+            Destroy(collision.gameObject);
+        }
+
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Creature"))
+        {
+            canBreed = false;
+            Genome g = Instantiate(this.gameObject, transform.position, Quaternion.identity).GetComponent<Creature>().Genome;
+            g = Genome.CrossOver(this.genome, collision.gameObject.GetComponent<Creature>().genome);
+            g.Mutate();
+        }
     }
 
 }

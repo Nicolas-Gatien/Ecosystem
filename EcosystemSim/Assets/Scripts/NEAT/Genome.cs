@@ -217,7 +217,7 @@ public class Genome
             }
 
             ConnectionGene con;
-            if (a.X > b.X)
+            if (a.X < b.X)
             {
                 con = new ConnectionGene(a, b);
             }else
@@ -232,6 +232,7 @@ public class Genome
             con = neat.GetConnection(con.From, con.To);
 
             con.Weight = UnityEngine.Random.Range(-2f, 2f);
+            con.Enabled = true;
             connections.Add(con);
 
             return;
@@ -239,54 +240,66 @@ public class Genome
     }
     public void MutateNode()
     {
-        ConnectionGene con = GetRandomConnect(connections);
-        if (con == null)
+        if (connections.Count > 0)
         {
-            return;
+            ConnectionGene con = GetRandomConnect(connections);
+            if (con == null)
+            {
+                return;
+            }
+
+            NodeGene from = con.From;
+            NodeGene to = con.To;
+
+            NodeGene middle = neat.GetNode();
+            middle.X = (from.X + to.X) / 2;
+            middle.Y = (from.Y + to.Y) / 2;
+
+            ConnectionGene con1 = neat.GetConnection(from, middle);
+            ConnectionGene con2 = neat.GetConnection(middle, to);
+
+            con1.Weight = 1;
+            con2.Weight = con.Weight;
+            con2.Enabled = con.Enabled;
+
+            connections.Remove(con);
+            connections.Add(con1);
+            connections.Add(con2);
+
+            nodes.Add(middle);
         }
-
-        NodeGene from = con.From;
-        NodeGene to = con.To;
-
-        NodeGene middle = neat.GetNode();
-        middle.X = (from.X + to.X) / 2;
-        middle.Y = (from.Y + to.Y) / 2;
-
-        ConnectionGene con1 = neat.GetConnection(from, middle);
-        ConnectionGene con2 = neat.GetConnection(middle, to);
-
-        con1.Weight = 1;
-        con2.Weight = con.Weight;
-        con2.Enabled = con.Enabled;
-
-        connections.Remove(con);
-        connections.Add(con1);
-        connections.Add(con2);
-
-        nodes.Add(middle);
     }
     public void MutateWeightShift()
     {
-        ConnectionGene con = GetRandomConnect(connections);
-        if (con != null)
+        if (connections.Count > 0)
         {
-            con.Weight += UnityEngine.Random.Range(-0.3f, 0.3f);
+            ConnectionGene con = GetRandomConnect(connections);
+            if (con != null)
+            {
+                con.Weight += UnityEngine.Random.Range(-0.3f, 0.3f);
+            }
         }
     }
     public void MutateWeightRandom()
     {
-        ConnectionGene con = GetRandomConnect(connections);
-        if (con != null)
+        if (connections.Count > 0)
         {
-            con.Weight = UnityEngine.Random.Range(-2f, 2f);
+            ConnectionGene con = GetRandomConnect(connections);
+            if (con != null)
+            {
+                con.Weight = UnityEngine.Random.Range(-2f, 2f);
+            }
         }
     }
     public void MutateLinkToggle()
     {
-        ConnectionGene con = GetRandomConnect(connections);
-        if (con != null)
+        if (connections.Count > 0)
         {
-            con.Enabled = !con.Enabled;
+            ConnectionGene con = GetRandomConnect(connections);
+            if (con != null)
+            {
+                con.Enabled = !con.Enabled;
+            }
         }
     }
 
