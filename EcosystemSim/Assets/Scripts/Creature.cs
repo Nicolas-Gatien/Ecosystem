@@ -18,6 +18,7 @@ public class Creature : MonoBehaviour
     public float turnSpeed;
     public float regenerationRate;
     float timeLeft;
+    public Color color;
 
     // vision
     public float viewRadius;
@@ -150,7 +151,7 @@ public class Creature : MonoBehaviour
         Transform nearest = GetNearestInLayer(mask).transform;
 
         return Vector2.Distance(transform.position, nearest.position);
-    }    
+    }
     private float GetAngleToNearest(LayerMask mask)
     {
         if (GetNearestInLayer(mask) == null)
@@ -186,6 +187,10 @@ public class Creature : MonoBehaviour
             1
         );
 
+        rb.mass = size * size * size;
+
+        GetComponent<SpriteRenderer>().color = color;
+
         movement.Move((float)outputs[0]);
         movement.Turn((float)outputs[1]);
 
@@ -195,7 +200,8 @@ public class Creature : MonoBehaviour
         if (energy > 0)
         {
             health += regenerationRate;
-        }else
+        }
+        else
         {
             health -= 1;
         }
@@ -217,7 +223,7 @@ public class Creature : MonoBehaviour
     }
     public void Mutate()
     {
-        genome.Mutate();
+        genome.Mutate(this);
     }
 
     private void GenerateCalculator()
@@ -247,15 +253,48 @@ public class Creature : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Creature"))
         {
-            if (canBreed == true && collision.gameObject.GetComponent<Creature>().canBreed == true)
+            Creature other = collision.gameObject.GetComponent<Creature>();
+            if (canBreed == true && other.canBreed == true)
             {
                 canBreed = false;
                 energy -= 50;
-                Genome geno = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>().Genome;
-                Creature creature = collision.gameObject.GetComponent<Creature>();
-                geno = genome.CrossOver(this.genome, creature.genome);
-                geno.Mutate();
-                Debug.Log("Offspring Created");
+
+                Creature child1 = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>();
+                Genome childGenes1 = genome.CrossOver(this.Genome, other.Genome);
+                child1.Genome = childGenes1;
+                child1.color = new Color((color.r + other.color.r) / 2,(color.g + other.color.g) / 2, (color.b + other.color.b) / 2);
+                child1.size = (size + other.size) / 2;
+                child1.moveSpeed = (moveSpeed + other.moveSpeed) / 2;
+                child1.turnSpeed = (turnSpeed + other.turnSpeed) / 2;
+                child1.maxEnergy = (maxEnergy + other.maxEnergy) / 2;
+                child1.maxHealth = (maxHealth + other.maxHealth) / 2;
+                child1.regenerationRate = (regenerationRate + other.regenerationRate) / 2;
+                child1.Mutate();
+
+                Creature child2 = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>();
+                Genome childGenes2 = genome;
+                child2.Genome = childGenes2;
+                child2.color = color;
+                child2.size = size;
+                child2.moveSpeed = moveSpeed;
+                child2.turnSpeed = turnSpeed;
+                child2.maxEnergy = maxEnergy;
+                child2.maxHealth = maxHealth;
+                child2.regenerationRate = regenerationRate;
+                child2.Mutate();
+
+                Creature child3 = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>();
+                Genome childGenes3 = other.Genome;
+                child3.Genome = childGenes3;
+                child3.color = other.color;
+                child3.size = other.size;
+                child3.moveSpeed = other.moveSpeed;
+                child3.turnSpeed = other.turnSpeed;
+                child3.maxEnergy = other.maxEnergy;
+                child3.maxHealth = other.maxHealth;
+                child3.regenerationRate = other.regenerationRate;
+                child3.Mutate();
+
             }
         }
     }

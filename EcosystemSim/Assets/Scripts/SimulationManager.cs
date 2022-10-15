@@ -7,7 +7,7 @@ public class SimulationManager : MonoBehaviour
     // FIELDS
     [SerializeField] private SpawnObject[] spawnObjects;
     private Neat neat;
-    public Collider2D island;
+    public LayerMask island;
 
     // METHODS
     private void Awake()
@@ -50,24 +50,28 @@ public class SimulationManager : MonoBehaviour
     {
 
         GameObject obj = Instantiate(item.prefab, GetRandomPosition(item), Quaternion.identity);
-        while (!obj.GetComponent<Collider2D>().IsTouching(island))
-        {
-            obj.transform.position = GetRandomPosition(item);
-        }
         Creature creature = obj.GetComponent<Creature>();
 
         if (creature != null)
         {
+
+            Color color = Random.ColorHSV(0, 1, 0, 1, 0.5f, 1, 1, 1);
+
             creature.neat = neat;
             creature.Genome = neat.EmptyGenome();
             creature.Genome.MutateLink();
             creature.Genome.MutateLink();
+            creature.color = color;
         }
     }
 
     Vector2 GetRandomPosition (SpawnObject spawnObject)
     {
         Vector2 pos = new Vector2(Random.Range(spawnObject.minPos.x, spawnObject.maxPos.x), Random.Range(spawnObject.minPos.y, spawnObject.maxPos.y));
+        while (Physics2D.OverlapCircle(pos, 0.1f, island) == false)
+        {
+            pos = new Vector2(Random.Range(spawnObject.minPos.x, spawnObject.maxPos.x), Random.Range(spawnObject.minPos.y, spawnObject.maxPos.y));
+        }
         return pos;
     }
 }

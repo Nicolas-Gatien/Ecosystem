@@ -181,29 +181,43 @@ public class Genome
     }
 
     // %%% CLEAN THIS UP
-    public void Mutate() {
-        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
+    public void Mutate(Creature c) {
+        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
         {
             MutateLink();
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
         {
             MutateLinkToggle();
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
         {
             MutateNode();
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
         {
             MutateWeightRandom();
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
         {
             MutateWeightShift();
         }
+        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
+        {
+            MutateTraits(c);
+        }
     }
 
+    public void MutateTraits(Creature c)
+    {
+        c.size += UnityEngine.Random.Range(-0.2f, 0.2f);
+        c.moveSpeed += UnityEngine.Random.Range(-0.5f, 0.5f);
+        c.turnSpeed += UnityEngine.Random.Range(-0.5f, 0.5f);
+        c.maxEnergy += UnityEngine.Random.Range(-5f, 5f);
+        c.maxHealth += UnityEngine.Random.Range(-5f, 5f);
+        c.regenerationRate += UnityEngine.Random.Range(-0.5f, 0.5f);
+        c.color += Color.HSVToRGB(UnityEngine.Random.Range(-1, 1), UnityEngine.Random.Range(-1, 1), 0);
+    }
     public void MutateLink()
     {
         for (int i = 0; i < 100; i++)
