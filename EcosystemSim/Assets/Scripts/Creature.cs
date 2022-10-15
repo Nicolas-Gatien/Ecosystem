@@ -17,6 +17,7 @@ public class Creature : MonoBehaviour
     public float moveSpeed;
     public float turnSpeed;
     public float regenerationRate;
+    float timeLeft;
 
     // vision
     public float viewRadius;
@@ -66,126 +67,6 @@ public class Creature : MonoBehaviour
             return calculator;
         }
     }
-    
-    private float HealthPercentage
-    {
-        get
-        {
-            return health / maxHealth;
-        }
-    }
-    private float EnergyPercentage
-    {
-        get
-        {
-            return energy / maxEnergy;
-        }
-    }
-
-    private int NumOfFoodsInRadius
-    {
-        get
-        {
-            return Physics2D.OverlapCircleAll(transform.position, viewRadius, foodMask).Length;
-        }
-    }
-    private int NumOfCreaturesInRadius
-    {
-        get
-        {
-            return Physics2D.OverlapCircleAll(transform.position, viewRadius, creatureMask).Length - 1;
-        }
-    }
-
-    private float DistanceToNearestFood
-    {
-        get
-        {
-            Collider2D[] foods = Physics2D.OverlapCircleAll(transform.position, viewRadius, foodMask);
-            float smallestDistance = 0;
-            for (int i = 0; i < foods.Length; i++)
-            {
-                if (Vector2.Distance(transform.position, foods[i].transform.position) < smallestDistance) 
-                {
-                    smallestDistance = Vector2.Distance(transform.position, foods[i].transform.position);
-                }
-            }
-
-            return smallestDistance;
-        }
-    }
-    private float DistanceToNearestCreatures
-    {
-        get
-        {
-            Collider2D[] creatures = Physics2D.OverlapCircleAll(transform.position, viewRadius, creatureMask);
-            float smallestDistance = 0;
-            for (int i = 0; i < creatures.Length; i++)
-            {
-                if (creatures[i].transform == transform)
-                {
-                    continue;
-                }
-                if (Vector2.Distance(transform.position, creatures[i].transform.position) < smallestDistance) 
-                {
-                    smallestDistance = Vector2.Distance(transform.position, creatures[i].transform.position);
-                }
-            }
-
-            return smallestDistance;
-        }
-    }
-
-    private float AngleToNearestFood
-    {
-        get
-        {
-            Collider2D[] foods = Physics2D.OverlapCircleAll(transform.position, viewRadius, foodMask);
-            float smallestDistance = 0;
-            int indexOfNearest = 0;
-            for (int i = 0; i < foods.Length; i++)
-            {
-                if (Vector2.Distance(transform.position, foods[i].transform.position) < smallestDistance)
-                {
-                    smallestDistance = Vector2.Distance(transform.position, foods[i].transform.position);
-                    indexOfNearest = i;
-                }
-            }
-
-            if (foods.Length > 0)
-            {
-                return Vector2.Angle(transform.position, foods[indexOfNearest].transform.position);
-            }
-
-            return 0;
-
-        }
-    }
-    private float AngleToNearestCreature
-    {
-        get
-        {
-            Collider2D[] creatures = Physics2D.OverlapCircleAll(transform.position, viewRadius, creatureMask);
-            float smallestDistance = 0;
-            int indexOfNearest = 0;
-            for (int i = 0; i < creatures.Length; i++)
-            {
-                if (creatures[i].transform == transform)
-                {
-                    continue;
-                }
-
-                if (Vector2.Distance(transform.position, creatures[i].transform.position) < smallestDistance)
-                {
-                    smallestDistance = Vector2.Distance(transform.position, creatures[i].transform.position);
-                    indexOfNearest = i;
-                }
-            }
-
-
-            return Vector2.Angle(transform.position, creatures[indexOfNearest].transform.position);
-        }
-    }
 
     public float energy
     {
@@ -217,9 +98,6 @@ public class Creature : MonoBehaviour
     {
         canBreed = false;
 
-        
-
-
         movement = GetComponent<CreatureMovement>();
         rb = GetComponent<Rigidbody2D>();
 
@@ -232,24 +110,86 @@ public class Creature : MonoBehaviour
         transform.localScale = new Vector3(size, size, size);
     }
 
+    private Collider2D GetNearestInLayer(LayerMask mask)
+    {
+        Collider2D[] obj = Physics2D.OverlapCircleAll(transform.position, viewRadius, mask);
+        if (obj.Length == 0)
+        {
+            return null;
+        }
+
+        float smallestDistance = 0;
+        int nearestIndex = 0;
+        for (int i = 0; i < obj.Length; i++)
+        {
+            if (obj[i].transform == transform)
+            {
+                continue;
+            }
+            if (Vector2.Distance(transform.position, obj[i].transform.position) < smallestDistance)
+            {
+                smallestDistance = Vector2.Distance(transform.position, obj[i].transform.position);
+                nearestIndex = i;
+            }
+        }
+
+        return obj[nearestIndex];
+    }
+
+    private float PercentageLeft(float current, float max)
+    {
+        return current / max;
+    }
+    private float GetDistanceToNearest(LayerMask mask)
+    {
+        if (GetNearestInLayer(mask) == null)
+        {
+            return 0;
+        }
+        Transform nearest = GetNearestInLayer(mask).transform;
+
+        return Vector2.Distance(transform.position, nearest.position);
+    }    
+    private float GetAngleToNearest(LayerMask mask)
+    {
+        if (GetNearestInLayer(mask) == null)
+        {
+            return 0;
+        }
+        Transform nearest = GetNearestInLayer(mask).transform;
+
+        return Vector2.Angle(transform.position, nearest.position);
+    }
+
+    private int GetNumInLayer(LayerMask mask)
+    {
+        if (mask == gameObject.layer)
+        {
+            return Physics2D.OverlapCircleAll(transform.position, viewRadius, mask).Length - 1;
+        }
+
+        return Physics2D.OverlapCircleAll(transform.position, viewRadius, mask).Length;
+    }
+
     private void Update()
     {
         double[] outputs = Calculate(
-            EnergyPercentage,
-            HealthPercentage,
-            NumOfFoodsInRadius,
-            NumOfCreaturesInRadius,
-            DistanceToNearestFood,
-            DistanceToNearestCreatures,
-            AngleToNearestFood,
-            AngleToNearestCreature,
+            PercentageLeft(health, maxHealth),
+            PercentageLeft(energy, maxEnergy),
+            GetNumInLayer(foodMask),
+            GetNumInLayer(creatureMask),
+            GetDistanceToNearest(foodMask),
+            GetDistanceToNearest(creatureMask),
+            GetAngleToNearest(foodMask),
+            GetAngleToNearest(creatureMask),
             1
         );
 
         movement.Move((float)outputs[0]);
         movement.Turn((float)outputs[1]);
 
-        energy -= (((size * (rb.velocity.sqrMagnitude * 0.1f)) / HealthPercentage) + 1) * Time.deltaTime;
+        timeLeft += Time.deltaTime;
+        energy -= (((size * (rb.velocity.sqrMagnitude * 0.1f)) / PercentageLeft(health, maxHealth)) + 1) * Time.deltaTime;
 
         if (energy > 0)
         {
@@ -302,18 +242,21 @@ public class Creature : MonoBehaviour
 
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Creature"))
         {
-            if (canBreed == true)
+            if (canBreed == true && collision.gameObject.GetComponent<Creature>().canBreed == true)
             {
+                canBreed = false;
+                energy -= 50;
                 Genome geno = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>().Genome;
                 Creature creature = collision.gameObject.GetComponent<Creature>();
-                //geno = Genome.CrossOver(this.genome, creature.genome);
+                geno = Genome.CrossOver(this.genome, creature.genome);
                 geno.Mutate();
+                Debug.Log("Offspring Created");
+                Destroy(gameObject);
             }
-            canBreed = false;
         }
     }
 
