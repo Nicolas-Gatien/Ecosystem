@@ -199,3 +199,4 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   canBreed: 0
+  creatureObject: {fileID: 6265060583414483216}

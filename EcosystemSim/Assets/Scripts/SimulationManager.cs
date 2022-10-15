@@ -49,10 +49,13 @@ public class SimulationManager : MonoBehaviour
     {
 
         GameObject obj = Instantiate(item.prefab, GetRandomPosition(item), Quaternion.identity);
+        Creature creature = obj.GetComponent<Creature>();
 
-        if (obj.GetComponent<Creature>() != null)
+        if (creature != null)
         {
-            obj.GetComponent<Creature>().neat = neat;
+            creature.neat = neat;
+            creature.Genome = neat.EmptyGenome();
+            creature.Genome.MutateLink();
         }
     }
 

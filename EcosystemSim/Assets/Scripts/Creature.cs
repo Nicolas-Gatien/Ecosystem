@@ -33,8 +33,8 @@ public class Creature : MonoBehaviour
     private Calculator calculator;
 
     public Neat neat;
-
-    public bool canBreed;
+    [HideInInspector] public bool canBreed;
+    public GameObject creatureObject;
 
     // PROPERTIES
     public Genome Genome
@@ -215,19 +215,10 @@ public class Creature : MonoBehaviour
     // METHODS
     private void Start()
     {
-        genome = neat.EmptyGenome();
-        genome.MutateLink();
-        genome.MutateLink();
-        genome.Mutate();
-        genome.Mutate();
-        genome.Mutate();
-        genome.Mutate();
-        genome.Mutate();
-        genome.Mutate();
-        genome.Mutate();
-        genome.Mutate();
-        genome.Mutate();
-        genome.Mutate();
+        canBreed = false;
+
+        
+
 
         movement = GetComponent<CreatureMovement>();
         rb = GetComponent<Rigidbody2D>();
@@ -315,10 +306,14 @@ public class Creature : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Creature"))
         {
+            if (canBreed == true)
+            {
+                Genome geno = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>().Genome;
+                Creature creature = collision.gameObject.GetComponent<Creature>();
+                //geno = Genome.CrossOver(this.genome, creature.genome);
+                geno.Mutate();
+            }
             canBreed = false;
-            Genome g = Instantiate(this.gameObject, transform.position, Quaternion.identity).GetComponent<Creature>().Genome;
-            g = Genome.CrossOver(this.genome, collision.gameObject.GetComponent<Creature>().genome);
-            g.Mutate();
         }
     }
 
