@@ -121,7 +121,7 @@ public class Genome
             + (neat.C3 * weightDiff
             );
     }
-    public static Genome CrossOver(Genome g1, Genome g2) {
+    public Genome CrossOver(Genome g1, Genome g2) {
         // %%% ADD TRAITS TO CROSS OVER
         Neat neat = g1.getNeat;
 
@@ -155,12 +155,12 @@ public class Genome
             if (innov1 > innov2)
             {
                 child.getConnections.Add(Neat.GetConnection(gene2));
-                innov2++;
+                indexG2++;
             }
             if (innov2 > innov1)
             {
                 child.getConnections.Add(Neat.GetConnection(gene1));
-                innov1++;
+                indexG1++;
             }
         }
 

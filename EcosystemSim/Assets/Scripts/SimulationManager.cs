@@ -7,6 +7,7 @@ public class SimulationManager : MonoBehaviour
     // FIELDS
     [SerializeField] private SpawnObject[] spawnObjects;
     private Neat neat;
+    public Collider2D island;
 
     // METHODS
     private void Awake()
@@ -49,6 +50,10 @@ public class SimulationManager : MonoBehaviour
     {
 
         GameObject obj = Instantiate(item.prefab, GetRandomPosition(item), Quaternion.identity);
+        while (!obj.GetComponent<Collider2D>().IsTouching(island))
+        {
+            obj.transform.position = GetRandomPosition(item);
+        }
         Creature creature = obj.GetComponent<Creature>();
 
         if (creature != null)
@@ -62,7 +67,8 @@ public class SimulationManager : MonoBehaviour
 
     Vector2 GetRandomPosition (SpawnObject spawnObject)
     {
-        return new Vector2(Random.Range(spawnObject.minPos.x, spawnObject.maxPos.x), Random.Range(spawnObject.minPos.y, spawnObject.maxPos.y));
+        Vector2 pos = new Vector2(Random.Range(spawnObject.minPos.x, spawnObject.maxPos.x), Random.Range(spawnObject.minPos.y, spawnObject.maxPos.y));
+        return pos;
     }
 }
 

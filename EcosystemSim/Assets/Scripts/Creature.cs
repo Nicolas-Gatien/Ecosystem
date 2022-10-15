@@ -101,8 +101,9 @@ public class Creature : MonoBehaviour
         movement = GetComponent<CreatureMovement>();
         rb = GetComponent<Rigidbody2D>();
 
-        energy = maxEnergy;
+        energy = maxEnergy / 2;
         health = maxHealth;
+        Debug.Log("Can Breed is: " + canBreed);
 
         movement.moveSpeed = moveSpeed;
         movement.turnSpeed = turnSpeed;
@@ -252,10 +253,9 @@ public class Creature : MonoBehaviour
                 energy -= 50;
                 Genome geno = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>().Genome;
                 Creature creature = collision.gameObject.GetComponent<Creature>();
-                geno = Genome.CrossOver(this.genome, creature.genome);
+                geno = genome.CrossOver(this.genome, creature.genome);
                 geno.Mutate();
                 Debug.Log("Offspring Created");
-                Destroy(gameObject);
             }
         }
     }
