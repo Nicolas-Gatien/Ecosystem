@@ -154,14 +154,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spawnObjects:
   - prefab: {fileID: 6265060583414483216, guid: 0b1ec2a54fbc7354892192f99716d58b, type: 3}
-    initialSpawnAmount: 150
+    initialSpawnAmount: 100
     recureSpawn: 0
     timeBtwRecurringSpawn: 1000
     timeBeforeNextSpawn: 0
     minPos: {x: -20, y: -20}
     maxPos: {x: 20, y: 20}
   - prefab: {fileID: 5810211368083275300, guid: 551a95213fff6d74aa660216a7f504c2, type: 3}
-    initialSpawnAmount: 300
+    initialSpawnAmount: 150
     recureSpawn: 1
     timeBtwRecurringSpawn: 0.2
     timeBeforeNextSpawn: 0

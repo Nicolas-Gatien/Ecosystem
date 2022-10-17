@@ -182,27 +182,27 @@ public class Genome
 
     // %%% CLEAN THIS UP
     public void Mutate(Creature c) {
-        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
         {
-            MutateLink();
+            MutateLink(c);
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
         {
-            MutateLinkToggle();
+            MutateLinkToggle(c);
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
         {
-            MutateNode();
+            MutateNode(c);
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
         {
-            MutateWeightRandom();
+            MutateWeightRandom(c);
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
         {
-            MutateWeightShift();
+            MutateWeightShift(c);
         }
-        if (UnityEngine.Random.Range(0f, 1f) < 0.4f)
+        if (UnityEngine.Random.Range(0f, 1f) < 0.2f)
         {
             MutateTraits(c);
         }
@@ -216,9 +216,9 @@ public class Genome
         c.maxEnergy += UnityEngine.Random.Range(-5f, 5f);
         c.maxHealth += UnityEngine.Random.Range(-5f, 5f);
         c.regenerationRate += UnityEngine.Random.Range(-0.5f, 0.5f);
-        c.color += Color.HSVToRGB(UnityEngine.Random.Range(-1, 1), UnityEngine.Random.Range(-1, 1), 0);
+        c.color += Color.HSVToRGB(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), 0);
     }
-    public void MutateLink()
+    public void MutateLink(Creature c)
     {
         for (int i = 0; i < 100; i++)
         {
@@ -231,13 +231,15 @@ public class Genome
             }
 
             ConnectionGene con;
-            if (a.X < b.X)
+            con = new ConnectionGene(a, b);
+
+            /*if (a.X < b.X)
             {
                 con = new ConnectionGene(a, b);
             }else
             {
                 con = new ConnectionGene(b, a);
-            }
+            }*/
 
             if (connections.Contains(con))
             {
@@ -248,11 +250,12 @@ public class Genome
             con.Weight = UnityEngine.Random.Range(-2f, 2f);
             con.Enabled = true;
             connections.Add(con);
+            c.color += Color.HSVToRGB(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), 0);
 
             return;
         }
     }
-    public void MutateNode()
+    public void MutateNode(Creature c)
     {
         if (connections.Count > 0)
         {
@@ -281,9 +284,11 @@ public class Genome
             connections.Add(con2);
 
             nodes.Add(middle);
+            c.color += Color.HSVToRGB(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), 0);
+
         }
     }
-    public void MutateWeightShift()
+    public void MutateWeightShift(Creature c)
     {
         if (connections.Count > 0)
         {
@@ -293,8 +298,10 @@ public class Genome
                 con.Weight += UnityEngine.Random.Range(-0.3f, 0.3f);
             }
         }
+        c.color += Color.HSVToRGB(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), 0);
+
     }
-    public void MutateWeightRandom()
+    public void MutateWeightRandom(Creature c)
     {
         if (connections.Count > 0)
         {
@@ -304,8 +311,10 @@ public class Genome
                 con.Weight = UnityEngine.Random.Range(-2f, 2f);
             }
         }
+        c.color += Color.HSVToRGB(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), 0);
+
     }
-    public void MutateLinkToggle()
+    public void MutateLinkToggle(Creature c)
     {
         if (connections.Count > 0)
         {
@@ -315,6 +324,8 @@ public class Genome
                 con.Enabled = !con.Enabled;
             }
         }
+        c.color += Color.HSVToRGB(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), 0);
+
     }
 
     private ConnectionGene GetRandomConnect(List<ConnectionGene> genes)

@@ -59,8 +59,8 @@ public class SimulationManager : MonoBehaviour
 
             creature.neat = neat;
             creature.Genome = neat.EmptyGenome();
-            creature.Genome.MutateLink();
-            creature.Genome.MutateLink();
+            creature.Genome.MutateLink(creature);
+            creature.Genome.MutateLink(creature);
             creature.color = color;
         }
     }
