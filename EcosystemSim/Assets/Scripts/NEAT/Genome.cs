@@ -211,11 +211,16 @@ public class Genome
     public void MutateTraits(Creature c)
     {
         c.size += UnityEngine.Random.Range(-0.2f, 0.2f);
-        c.moveSpeed += UnityEngine.Random.Range(-0.5f, 0.5f);
+        c.baseSpeed += UnityEngine.Random.Range(-0.5f, 0.5f);
         c.turnSpeed += UnityEngine.Random.Range(-0.5f, 0.5f);
         c.maxEnergy += UnityEngine.Random.Range(-5f, 5f);
         c.maxHealth += UnityEngine.Random.Range(-5f, 5f);
-        c.regenerationRate += UnityEngine.Random.Range(-0.5f, 0.5f);
+        c.startRecoveryTime += UnityEngine.Random.Range(-1f, 1f);
+        c.timeBtwDamage += UnityEngine.Random.Range(-1f, 1f);
+        c.maturityAge += UnityEngine.Random.Range(-1f, 1f);
+        c.regenerationRate += UnityEngine.Random.Range(-1f, 1f);
+        c.maxHealth += UnityEngine.Random.Range(-5f, 5f);
+        c.boneDensity += UnityEngine.Random.Range(-0.1f, 0.1f);
         c.color += Color.HSVToRGB(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5), 0);
     }
     public void MutateLink(Creature c)
@@ -232,14 +237,6 @@ public class Genome
 
             ConnectionGene con;
             con = new ConnectionGene(a, b);
-
-            /*if (a.X < b.X)
-            {
-                con = new ConnectionGene(a, b);
-            }else
-            {
-                con = new ConnectionGene(b, a);
-            }*/
 
             if (connections.Contains(con))
             {

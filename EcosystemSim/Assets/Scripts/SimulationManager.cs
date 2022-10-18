@@ -7,12 +7,13 @@ public class SimulationManager : MonoBehaviour
     // FIELDS
     [SerializeField] private SpawnObject[] spawnObjects;
     private Neat neat;
-    public LayerMask island;
+    public LayerMask spawnOn;
+    public LayerMask spawnOff;
 
     // METHODS
     private void Awake()
     {
-        neat = new Neat(9, 2, 1);   
+        neat = new Neat(10, 2, 1);   
     }
 
     void Start()
@@ -68,7 +69,7 @@ public class SimulationManager : MonoBehaviour
     Vector2 GetRandomPosition (SpawnObject spawnObject)
     {
         Vector2 pos = new Vector2(Random.Range(spawnObject.minPos.x, spawnObject.maxPos.x), Random.Range(spawnObject.minPos.y, spawnObject.maxPos.y));
-        while (Physics2D.OverlapCircle(pos, 0.1f, island) == false)
+        while (Physics2D.OverlapCircle(pos, 0.1f, spawnOn) == false || Physics2D.OverlapCircle(pos, 0.5f, spawnOff) == true)
         {
             pos = new Vector2(Random.Range(spawnObject.minPos.x, spawnObject.maxPos.x), Random.Range(spawnObject.minPos.y, spawnObject.maxPos.y));
         }
