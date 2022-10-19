@@ -8,7 +8,7 @@ public class CreatureMovement : MonoBehaviour
     [HideInInspector] public float moveSpeed;
     [HideInInspector] public float turnSpeed;
 
-    [SerializeField] private Transform rotationTransform;
+    public Transform rotationTransform;
 
     Rigidbody2D rb;
 

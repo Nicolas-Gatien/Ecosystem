@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,6 +24,10 @@ public class Creature : MonoBehaviour
     public float baseSpeed;
     private float trueSpeed;
     public float turnSpeed;
+
+    [Header("Vision Traits")]
+    public float fieldOfView = 90;
+    public float rangeOfView = 5;
 
     [Header("General Traits")]
     public float size;
@@ -52,6 +57,7 @@ public class Creature : MonoBehaviour
     public Neat neat;
     [HideInInspector] public bool canBreed;
     public GameObject creatureObject;
+    public GameObject foodPrefab;
 
     // PROPERTIES
     public Genome Genome
@@ -146,7 +152,7 @@ public class Creature : MonoBehaviour
         health = maxHealth;
 
         mass = (size * size * size) * boneDensity;
-        trueSpeed = baseSpeed / mass;
+        trueSpeed = (baseSpeed / mass) * size;
 
         movement.moveSpeed = trueSpeed;
         movement.turnSpeed = turnSpeed;
@@ -154,13 +160,10 @@ public class Creature : MonoBehaviour
         transform.localScale = new Vector3(size, size, size);
     }
 
-    private Collider2D GetNearestInLayer(LayerMask mask)
+    private RaycastHit2D GetNearestInLayer(LayerMask mask)
     {
-        Collider2D[] obj = Physics2D.OverlapCircleAll(transform.position, viewRadius, mask);
-        if (obj.Length == 0)
-        {
-            return null;
-        }
+        Vector2 dir = DirectionOfCreature();
+        RaycastHit2D[] obj = Physics2D.CircleCastAll(transform.position, fieldOfView, dir, rangeOfView, mask);
 
         float smallestDistance = 0;
         int nearestIndex = 0;
@@ -170,9 +173,9 @@ public class Creature : MonoBehaviour
             {
                 continue;
             }
-            if (Vector2.Distance(transform.position, obj[i].transform.position) < smallestDistance)
+            if (Vector2.Distance(transform.position, obj[i].point) < smallestDistance)
             {
-                smallestDistance = Vector2.Distance(transform.position, obj[i].transform.position);
+                smallestDistance = Vector2.Distance(transform.position, obj[i].point);
                 nearestIndex = i;
             }
         }
@@ -186,33 +189,28 @@ public class Creature : MonoBehaviour
     }
     private float GetDistanceToNearest(LayerMask mask)
     {
-        if (GetNearestInLayer(mask) == null)
-        {
-            return 0;
-        }
-        Transform nearest = GetNearestInLayer(mask).transform;
+        Vector2 nearest = GetNearestInLayer(mask).point;
 
-        return Vector2.Distance(transform.position, nearest.position);
+        return Vector2.Distance(transform.position, nearest);
     }
     private float GetAngleToNearest(LayerMask mask)
     {
-        if (GetNearestInLayer(mask) == null)
-        {
-            return 0;
-        }
-        Transform nearest = GetNearestInLayer(mask).transform;
+        Vector2 nearest = GetNearestInLayer(mask).point;
 
-        return Vector2.Angle(transform.position, nearest.position);
+        return Vector2.Angle(transform.position, nearest);
     }
 
     private int GetNumInLayer(LayerMask mask)
     {
+        Vector2 dir = DirectionOfCreature();
+
+
         if (mask == gameObject.layer)
         {
-            return Physics2D.OverlapCircleAll(transform.position, viewRadius, mask).Length - 1;
+            return Physics2D.CircleCastAll(transform.position, fieldOfView, dir, rangeOfView, mask).Length - 1;
         }
 
-        return Physics2D.OverlapCircleAll(transform.position, viewRadius, mask).Length;
+        return Physics2D.CircleCastAll(transform.position, fieldOfView,dir, rangeOfView, mask).Length;
     }
 
     private void Update()
@@ -261,17 +259,26 @@ public class Creature : MonoBehaviour
             timeBeforeNextDamage = timeBtwDamage;
         }
 
-
-
         if (health <= 0)
         {
-            Destroy(gameObject);
+            Die();
         }
 
         if (health > maxHealth)
         {
             health = maxHealth;
         }
+    }
+
+    void Die()
+    {
+        int foods = (int)(mass / 2) + 1;
+        for (int i = 0; i < foods; i++)
+        {
+            Instantiate(foodPrefab, transform.position, Quaternion.identity);
+        }
+
+        Destroy(gameObject);
     }
 
     public double Distance(Creature other)
@@ -298,12 +305,11 @@ public class Creature : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Food"))
+        if (collision.gameObject.CompareTag("Food"))
         {
-            energy += 50 / size;
+            energy += 50 / mass;
             Destroy(collision.gameObject);
         }
-
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -316,44 +322,66 @@ public class Creature : MonoBehaviour
                 canBreed = false;
                 energy -= 50;
 
-                Creature child1 = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>();
-                Genome childGenes1 = genome.CrossOver(this.Genome, other.Genome);
-                child1.Genome = childGenes1;
-                child1.color = new Color((color.r + other.color.r) / 2,(color.g + other.color.g) / 2, (color.b + other.color.b) / 2);
-                child1.size = (size + other.size) / 2;
-                child1.trueSpeed = (trueSpeed + other.trueSpeed) / 2;
-                child1.turnSpeed = (turnSpeed + other.turnSpeed) / 2;
-                child1.maxEnergy = (maxEnergy + other.maxEnergy) / 2;
-                child1.maxHealth = (maxHealth + other.maxHealth) / 2;
-                child1.regenerationRate = (regenerationRate + other.regenerationRate) / 2;
-                child1.Mutate();
+                int babies = UnityEngine.Random.Range(0, 3) + 1;
 
-                Creature child2 = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>();
-                Genome childGenes2 = genome;
-                child2.Genome = childGenes2;
-                child2.color = color;
-                child2.size = size;
-                child2.trueSpeed = trueSpeed;
-                child2.turnSpeed = turnSpeed;
-                child2.maxEnergy = maxEnergy;
-                child2.maxHealth = maxHealth;
-                child2.regenerationRate = regenerationRate;
-                child2.Mutate();
-
-                Creature child3 = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>();
-                Genome childGenes3 = other.Genome;
-                child3.Genome = childGenes3;
-                child3.color = other.color;
-                child3.size = other.size;
-                child3.trueSpeed = other.trueSpeed;
-                child3.turnSpeed = other.turnSpeed;
-                child3.maxEnergy = other.maxEnergy;
-                child3.maxHealth = other.maxHealth;
-                child3.regenerationRate = other.regenerationRate;
-                child3.Mutate();
+                for (int i = 0; i < babies; i++)
+                {
+                    if (UnityEngine.Random.Range(0f,1f) < 0.5)
+                    {
+                        if (UnityEngine.Random.Range(0f, 1f) < 0.5)
+                        {
+                            SpawnOffSpringBasedOnParent(this);
+                        } else
+                        {
+                            SpawnOffSpringBasedOnParent(other);
+                        }
+                    }else
+                    {
+                        SpawnOffSprintBasedOnBothParents(other);
+                    }
+                }
 
             }
         }
     }
 
+    void SpawnOffSpringBasedOnParent(Creature parent)
+    {
+        Creature child = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>();
+        Genome childGenes = parent.Genome;
+        child.Genome = childGenes;
+        child.color = parent.color;
+        child.size = parent.size;
+        child.trueSpeed = parent.trueSpeed;
+        child.turnSpeed = parent.turnSpeed;
+        child.maxEnergy = parent.maxEnergy;
+        child.maxHealth = parent.maxHealth;
+        child.regenerationRate = parent.regenerationRate;
+        child.Mutate();
+    }
+
+    void SpawnOffSprintBasedOnBothParents(Creature other)
+    {
+        Creature child1 = Instantiate(creatureObject, transform.position, Quaternion.identity).GetComponent<Creature>();
+        Genome childGenes1 = genome.CrossOver(this.Genome, other.Genome);
+        child1.Genome = childGenes1;
+        child1.color = new Color((color.r + other.color.r) / 2, (color.g + other.color.g) / 2, (color.b + other.color.b) / 2);
+        child1.size = (size + other.size) / 2;
+        child1.trueSpeed = (trueSpeed + other.trueSpeed) / 2;
+        child1.turnSpeed = (turnSpeed + other.turnSpeed) / 2;
+        child1.maxEnergy = (maxEnergy + other.maxEnergy) / 2;
+        child1.maxHealth = (maxHealth + other.maxHealth) / 2;
+        child1.regenerationRate = (regenerationRate + other.regenerationRate) / 2;
+        child1.Mutate();
+    }
+
+    Vector2 DirectionOfCreature()
+    {
+        return movement.rotationTransform.right;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawRay(transform.position, DirectionOfCreature());
+    }
 }

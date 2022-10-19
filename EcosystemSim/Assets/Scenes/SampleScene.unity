@@ -161,9 +161,9 @@ MonoBehaviour:
     minPos: {x: -20, y: -20}
     maxPos: {x: 20, y: 20}
   - prefab: {fileID: 5810211368083275300, guid: 551a95213fff6d74aa660216a7f504c2, type: 3}
-    initialSpawnAmount: 150
+    initialSpawnAmount: 20
     recureSpawn: 1
-    timeBtwRecurringSpawn: 0.3
+    timeBtwRecurringSpawn: 3
     timeBeforeNextSpawn: 0
     minPos: {x: -20, y: -20}
     maxPos: {x: 20, y: 20}

@@ -190,12 +190,11 @@ MonoBehaviour:
   timeBtwDamage: 1
   maxHealth: 10
   health: 5
+  baseSpeed: 4
+  turnSpeed: 15
   size: 1
   _boneDensity: 1
-  baseSpeed: 4
-  trueSpeed: 0
-  turnSpeed: 15
-  mass: 0
+  maturityAge: 0
   color: {r: 0, g: 0, b: 0, a: 0}
   viewRadius: 5
   foodMask:
@@ -206,3 +205,4 @@ MonoBehaviour:
     m_Bits: 128
   canBreed: 0
   creatureObject: {fileID: 6265060583414483216}
+  foodPrefab: {fileID: 6749742336665328147, guid: 06859cd44853d9a419b81e04864bd240, type: 3}
