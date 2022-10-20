@@ -7,59 +7,49 @@ public class Creature : MonoBehaviour
 {
     // FIELDS
     [Header("Traits")]
-    [Header("Energy Traits")]
-    public float maxEnergy = 500;
-    private float _energy;
-
-    [Header("Health Traits")]
-    public float regenerationRate;
-    private float recoveryTime;
-    public float startRecoveryTime;
-    public float timeBtwDamage;
-    private float timeBeforeNextDamage;
+    [Space]
     public float maxHealth = 50;
-    public float health;
-
-    [Header("Movement Traits")]
+    public float recoveryTime;
+    public float regenerationStrength;
+    public float timeBtwDamage;
+    [Space]
     public float baseSpeed;
-    private float trueSpeed;
     public float turnSpeed;
-
-    [Header("Vision Traits")]
+    [Space]
     public float fieldOfView = 90;
     public float rangeOfView = 5;
-
-    [Header("General Traits")]
-    public float size;
-    [Range(0, 1)]
-    [SerializeField] private float _boneDensity = 1;
+    [Space]
+    public float maxSize;
     public float maturityAge;
-    private float age;
-
-    private float mass;
+    [Space]
+    public float maxEnergy = 500;
+    [Space]
     public Color color;
+    [Space]
+    public float stomacheSize;
+    public float digestionSpeed;
+    [Space]
+    public Transform rotationTransform;
 
-    // vision
-    public float viewRadius;
+    private float _energy;
+    private float trueSpeed;
+    private float age;
+    private float mass;
     public LayerMask foodMask;
     public LayerMask creatureMask;
 
-    // components
     private CreatureMovement movement;
+    private CreatureHealth health;
+
     private Rigidbody2D rb;
     private SpriteRenderer rend;
-
-    // ai
     private Genome genome;
     private Species species;
     private Calculator calculator;
-
     public Neat neat;
-    [HideInInspector] public bool canBreed;
+    public bool canBreed;
     public GameObject creatureObject;
     public GameObject foodPrefab;
-
-    // PROPERTIES
     public Genome Genome
     {
         get
@@ -89,8 +79,7 @@ public class Creature : MonoBehaviour
             return calculator;
         }
     }
-
-    private float energy
+    public float energy
     {
         get
         {
@@ -117,52 +106,61 @@ public class Creature : MonoBehaviour
             _energy = value;
         }
     }
-    public float boneDensity
-    {
-        get
-        {
-            return _boneDensity;
-        }
-        set
-        {
-            if(value > 1)
-            {
-                _boneDensity = 1;
-                return;
-            }
-            if (value < 0.1f)
-            {
-                _boneDensity = 0.1f;
-                return;
-            }
-            _boneDensity = value;
-        }
-    }
+
 
     // METHODS
     private void Start()
     {
         canBreed = false;
 
-        movement = GetComponent<CreatureMovement>();
         rb = GetComponent<Rigidbody2D>();
         rend = GetComponent<SpriteRenderer>();
 
         energy = maxEnergy / 2;
-        health = maxHealth;
 
-        mass = (size * size * size) * boneDensity;
-        trueSpeed = (baseSpeed / mass) * size;
+        mass = (maxSize * maxSize * maxSize);
+        trueSpeed = (baseSpeed / mass) * maxSize;
 
-        movement.moveSpeed = trueSpeed;
-        movement.turnSpeed = turnSpeed;
+        rb.mass = mass;
 
-        transform.localScale = new Vector3(size, size, size);
+        transform.localScale = new Vector3(maxSize, maxSize, maxSize);
+
+        movement = new CreatureMovement(trueSpeed, turnSpeed, rotationTransform, rb);
+        health = new CreatureHealth(maxHealth, recoveryTime, timeBtwDamage, regenerationStrength, this);
+    }
+
+    private void Update()
+    {
+        double[] outputs = Calculate(
+            health.PercentageLeft(),
+            PercentageLeft(energy, maxEnergy),
+            GetNumInLayer(foodMask),
+            GetNumInLayer(creatureMask),
+            GetDistanceToNearest(foodMask),
+            GetDistanceToNearest(creatureMask),
+            GetAngleToNearest(foodMask),
+            GetAngleToNearest(creatureMask),
+            rb.velocity.sqrMagnitude,
+            age,
+            1
+        );
+
+        rend.color = color;
+        rend.sortingOrder = -(int)(transform.position.y * 5);
+
+        age += Time.deltaTime;
+        energy -= (((mass * (rb.velocity.sqrMagnitude * 0.1f)) / health.PercentageLeft()) + 1) * Time.deltaTime;
+
+        movement.Move((float)outputs[0]);
+        movement.Turn((float)outputs[1]);
+
+        health.TickTimers(Time.deltaTime);
+        health.Update();
     }
 
     private RaycastHit2D GetNearestInLayer(LayerMask mask)
     {
-        Vector2 dir = DirectionOfCreature();
+        Vector2 dir = movement.GetRiseOverRun();
         RaycastHit2D[] obj = Physics2D.CircleCastAll(transform.position, fieldOfView, dir, rangeOfView, mask);
 
         float smallestDistance = 0;
@@ -182,27 +180,33 @@ public class Creature : MonoBehaviour
 
         return obj[nearestIndex];
     }
-
     private float PercentageLeft(float current, float max)
     {
         return current / max;
     }
     private float GetDistanceToNearest(LayerMask mask)
     {
+        if (GetNearestInLayer(mask) == false)
+        {
+            return 0;
+        }
         Vector2 nearest = GetNearestInLayer(mask).point;
 
         return Vector2.Distance(transform.position, nearest);
     }
     private float GetAngleToNearest(LayerMask mask)
     {
+        if (GetNearestInLayer(mask) == false)
+        {
+            return 0;
+        }
         Vector2 nearest = GetNearestInLayer(mask).point;
 
         return Vector2.Angle(transform.position, nearest);
     }
-
     private int GetNumInLayer(LayerMask mask)
     {
-        Vector2 dir = DirectionOfCreature();
+        Vector2 dir = movement.GetRiseOverRun();
 
 
         if (mask == gameObject.layer)
@@ -210,67 +214,10 @@ public class Creature : MonoBehaviour
             return Physics2D.CircleCastAll(transform.position, fieldOfView, dir, rangeOfView, mask).Length - 1;
         }
 
-        return Physics2D.CircleCastAll(transform.position, fieldOfView,dir, rangeOfView, mask).Length;
+        return Physics2D.CircleCastAll(transform.position, fieldOfView, dir, rangeOfView, mask).Length;
     }
 
-    private void Update()
-    {
-        double[] outputs = Calculate(
-            PercentageLeft(health, maxHealth),
-            PercentageLeft(energy, maxEnergy),
-            GetNumInLayer(foodMask),
-            GetNumInLayer(creatureMask),
-            GetDistanceToNearest(foodMask),
-            GetDistanceToNearest(creatureMask),
-            GetAngleToNearest(foodMask),
-            GetAngleToNearest(creatureMask),
-            rb.velocity.sqrMagnitude,
-            1
-        );
-
-        rb.mass = mass;
-        rend.sortingOrder = -(int)(transform.position.y * 5);
-
-        rend.color = color;
-
-        movement.Move((float)outputs[0]);
-        movement.Turn((float)outputs[1]);
-
-        age += Time.deltaTime;
-        recoveryTime -= Time.deltaTime;
-        timeBeforeNextDamage -= Time.deltaTime;
-
-        energy -= (((mass * (rb.velocity.sqrMagnitude * 0.1f) * boneDensity) / PercentageLeft(health, maxHealth)) + 1) * Time.deltaTime;
-
-        if (timeBeforeNextDamage <= 0)
-        {
-            if (energy > 0)
-            {
-                if (recoveryTime <= 0)
-                {
-                    health += regenerationRate;
-                }
-            }
-            else
-            {
-                health -= 1 / boneDensity;
-                recoveryTime = startRecoveryTime;
-            }
-            timeBeforeNextDamage = timeBtwDamage;
-        }
-
-        if (health <= 0)
-        {
-            Die();
-        }
-
-        if (health > maxHealth)
-        {
-            health = maxHealth;
-        }
-    }
-
-    void Die()
+    public void Die()
     {
         int foods = (int)(mass / 2) + 1;
         for (int i = 0; i < foods; i++)
@@ -351,12 +298,12 @@ public class Creature : MonoBehaviour
         Genome childGenes = parent.Genome;
         child.Genome = childGenes;
         child.color = parent.color;
-        child.size = parent.size;
+        child.maxSize = parent.maxSize;
         child.trueSpeed = parent.trueSpeed;
         child.turnSpeed = parent.turnSpeed;
         child.maxEnergy = parent.maxEnergy;
         child.maxHealth = parent.maxHealth;
-        child.regenerationRate = parent.regenerationRate;
+        child.regenerationStrength = parent.regenerationStrength;
         child.Mutate();
     }
 
@@ -366,22 +313,12 @@ public class Creature : MonoBehaviour
         Genome childGenes1 = genome.CrossOver(this.Genome, other.Genome);
         child1.Genome = childGenes1;
         child1.color = new Color((color.r + other.color.r) / 2, (color.g + other.color.g) / 2, (color.b + other.color.b) / 2);
-        child1.size = (size + other.size) / 2;
+        child1.maxSize = (maxSize + other.maxSize) / 2;
         child1.trueSpeed = (trueSpeed + other.trueSpeed) / 2;
         child1.turnSpeed = (turnSpeed + other.turnSpeed) / 2;
         child1.maxEnergy = (maxEnergy + other.maxEnergy) / 2;
         child1.maxHealth = (maxHealth + other.maxHealth) / 2;
-        child1.regenerationRate = (regenerationRate + other.regenerationRate) / 2;
+        child1.regenerationStrength = (regenerationStrength + other.regenerationStrength) / 2;
         child1.Mutate();
-    }
-
-    Vector2 DirectionOfCreature()
-    {
-        return movement.rotationTransform.right;
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.DrawRay(transform.position, DirectionOfCreature());
     }
 }

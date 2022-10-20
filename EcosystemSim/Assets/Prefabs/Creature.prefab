@@ -41,7 +41,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6265060583414483228}
   - component: {fileID: 6265060583414483229}
-  - component: {fileID: 6265060583414483218}
   - component: {fileID: 6265060583414483219}
   - component: {fileID: 7952064846198185542}
   - component: {fileID: -2679977639346135762}
@@ -120,21 +119,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &6265060583414483218
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6265060583414483216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2d6a1780da49d048b920bd5ce7dafdf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 5
-  turnSpeed: 15
-  rotationTransform: {fileID: 6265060582893419510}
 --- !u!50 &6265060583414483219
 Rigidbody2D:
   serializedVersion: 4
@@ -184,19 +168,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2073771068e9504bb8e6ab9e4092a37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxEnergy: 75
-  regenerationRate: 2
-  startRecoveryTime: 1
-  timeBtwDamage: 1
   maxHealth: 10
-  health: 5
+  recoveryTime: 1
+  regenerationStrength: 1
+  timeBtwDamage: 1
   baseSpeed: 4
   turnSpeed: 15
-  size: 1
-  _boneDensity: 1
-  maturityAge: 0
+  fieldOfView: 90
+  rangeOfView: 5
+  maxSize: 1
+  maturityAge: 1
+  maxEnergy: 75
   color: {r: 0, g: 0, b: 0, a: 0}
-  viewRadius: 5
+  stomacheSize: 0
+  digestionSpeed: 0
+  rotationTransform: {fileID: 6265060582893419510}
   foodMask:
     serializedVersion: 2
     m_Bits: 64

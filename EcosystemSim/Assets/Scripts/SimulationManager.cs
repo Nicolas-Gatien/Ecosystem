@@ -13,7 +13,7 @@ public class SimulationManager : MonoBehaviour
     // METHODS
     private void Awake()
     {
-        neat = new Neat(10, 2, 1);   
+        neat = new Neat(11, 2, 1);   
     }
 
     void Start()
